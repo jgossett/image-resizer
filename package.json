@@ -4,11 +4,13 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "nodemon --exec \"npm run start:electron\"",
+    "start:electron": "electron ."
   },
   "author": "Joshua Gossettt",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^12.0.2"
+    "electron": "^12.0.2",
+    "nodemon": "^2.0.7"
   }
 }
