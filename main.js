@@ -1,10 +1,11 @@
-const {app, BrowserWindow, Menu, isMac, globalShortcut} = require('electron')
+const {app, BrowserWindow, Menu, isMac, globalShortcut} = require('electron');
 
 let mainWindow;
+let aboutWindow;
 
 function createBrowserWindow() {
     const browserWindow = new BrowserWindow({
-        title: 'Image Resize',
+        title: app.name,
         width: 500,
         height: 600,
         icon: `${__dirname}/assets/icons/icon__256x256.png`
@@ -15,38 +16,73 @@ function createBrowserWindow() {
     return browserWindow;
 }
 
+function createAboutWindow() {
+    const browserWindow = new BrowserWindow({
+        title: `About ${app.name}`,
+        width: 200,
+        height: 300,
+        resizable: false,
+        icon: `${__dirname}/assets/icons/icon__256x256.png`
+    });
+
+    browserWindow.loadFile(`./app/about.html`);
+
+    return browserWindow;
+}
+
 function createApplicationMenu() {
-    const menuTemplate = [
-        {
-            label: 'File',
-            submenu: [
-                // quit
-                {
-                    label: 'Quit',
-                    click: () => {
-                        app.quit();
-                    },
-                    accelerator: 'CmdOrCtrl+W'
+    const fileMenu = {
+        role: 'fileMenu'
+    };
+
+    const developerMenu = {
+        label: "Developer",
+        submenu: [
+            {role: 'reload'},
+            {role: 'forcereload'},
+            {type: 'separator'},
+            {role: 'toggleDevTools'}
+        ]
+    };
+
+    const helpMenu = {
+        role:"help",
+        submenu: [
+            {
+                label: 'About',
+                click: () => {
+                    aboutWindow = createAboutWindow();
                 }
-            ]
-        }
+            }
+        ]
+    }
+
+    const createDefaultMenu = () => [
+        fileMenu,
+        developerMenu,
+        helpMenu
+    ];
+    const createMacOsMenu = () => [
+        {
+            role: 'appMenu'
+        },
+        fileMenu,
+        developerMenu
     ]
 
-    if (isMac) {
-        menuTemplate.unshift({role: 'appMenu'});
-    }
+    const menuTemplate = !isMac ? createDefaultMenu() : createMacOsMenu();
 
     return Menu.buildFromTemplate(menuTemplate)
 }
 
-async function onStartUp(){
+async function onStartUp() {
     await app.whenReady()
 
     app.applicationMenu = createApplicationMenu();
     globalShortcut.register("CmdOrCtrl+R", () => mainWindow.reload())
-    globalShortcut.register("CmdOrCtrl+Shift+I", ()=> mainWindow.toggleDevTools())
+    globalShortcut.register("CmdOrCtrl+Shift+I", () => mainWindow.toggleDevTools())
 
     mainWindow = createBrowserWindow();
 }
 
-onStartUp();
+onStartUp()
