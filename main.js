@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, Menu, isMac, globalShortcut} = require('electron')
 
 let mainWindow;
 
@@ -15,6 +15,38 @@ function createBrowserWindow() {
     return browserWindow;
 }
 
-app.on('ready', () => {
+function createApplicationMenu() {
+    const menuTemplate = [
+        {
+            label: 'File',
+            submenu: [
+                // quit
+                {
+                    label: 'Quit',
+                    click: () => {
+                        app.quit();
+                    },
+                    accelerator: 'CmdOrCtrl+W'
+                }
+            ]
+        }
+    ]
+
+    if (isMac) {
+        menuTemplate.unshift({role: 'appMenu'});
+    }
+
+    return Menu.buildFromTemplate(menuTemplate)
+}
+
+async function onStartUp(){
+    await app.whenReady()
+
+    app.applicationMenu = createApplicationMenu();
+    globalShortcut.register("CmdOrCtrl+R", () => mainWindow.reload())
+    globalShortcut.register("CmdOrCtrl+Shift+I", ()=> mainWindow.toggleDevTools())
+
     mainWindow = createBrowserWindow();
-})
+}
+
+onStartUp();
