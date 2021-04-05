@@ -1,17 +1,31 @@
-const {app, BrowserWindow, Menu, isMac, globalShortcut} = require('electron');
+const {app, BrowserWindow, Menu, isMac, globalShortcut, ipcMain} = require('electron');
+
+const ENVIRONMENTS = {
+    local: 1,
+    production: 2,
+}
 
 let mainWindow;
 let aboutWindow;
+let environment = ENVIRONMENTS.local;
 
 function createBrowserWindow() {
     const browserWindow = new BrowserWindow({
         title: app.name,
-        width: 500,
+        width: environment !== ENVIRONMENTS.local ? 500 : 1000,
         height: 600,
-        icon: `${__dirname}/assets/icons/icon__256x256.png`
+        icon: `${__dirname}/assets/icons/icon__256x256.png`,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
     });
 
     browserWindow.loadFile(`./app/index.html`);
+
+    if (environment === ENVIRONMENTS.local) {
+        browserWindow.webContents.openDevTools();
+    }
 
     return browserWindow;
 }
@@ -46,7 +60,7 @@ function createApplicationMenu() {
     };
 
     const helpMenu = {
-        role:"help",
+        role: "help",
         submenu: [
             {
                 label: 'About',
@@ -84,5 +98,9 @@ async function onStartUp() {
 
     mainWindow = createBrowserWindow();
 }
+
+ipcMain.on('image.shrink', (event, options) => {
+   console.log(options);
+});
 
 onStartUp()

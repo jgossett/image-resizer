@@ -17,19 +17,16 @@
 
     <p>Select a image file to resize.</p>
 
-    <form id="image-form">
+    <form id="image-resize-form">
 
-        <!-- select file -->
+        <!-- image file -->
         <div class="file-field input-field">
             <div class="btn">
                 Browse
+                <input id="image-path"
+                       type="file"/>
             </div>
-            <input id="image-file-path"
-                   type="file"/>
-        </div>
 
-        <!-- upload file -->
-        <div class="file-path-wrapper">
             <input class="file-path validate"
                    placeholder="Upload File"
                    type="text"/>
@@ -45,19 +42,49 @@
             </em>
         </p>
 
+        <!-- image quality -->
         <p class="range-field">
-            <input id="slider"
+            <input id="image-quality"
                    max="100"
                    min="0"
                    type="range">
         </p>
 
+        <!-- resize button -->
         <input class="btn black"
                type="submit"
                value="Resize">
     </form>
+
+    <div class="card output">
+        <div class="card-content">
+            Output Folder Path: <span id='output-folder-path'></span>
+        </div>
+    </div>
 </div>
 
 <script src="js/materialize.min.js"></script>
+<script>
+    const path = require('path');
+    const os = require('os');
+    const {ipcRenderer} = require('electron');
+
+    const outputFolderPathElement = document.getElementById('output-folder-path');
+    const imageQualityElement = document.getElementById('image-quality');
+    const resizeImageForm = document.getElementById('image-resize-form');
+    const imagePathElement = document.getElementById('image-path');
+
+    const outputFolderPath = path.join(os.homedir(), 'Pictures');
+    outputFolderPathElement.innerText = outputFolderPath;
+
+    resizeImageForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const imagePath = imagePathElement.files[0].path;
+        const imageQuality = imageQualityElement.value;
+
+        ipcRenderer.send('image.shrink', {imagePath, imageQuality});
+    });
+</script>
 </body>
 </html>
