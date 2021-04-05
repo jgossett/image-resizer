@@ -1,19 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <title>Image Resizer</title>
-    <meta http-equiv="content-security-policy" content="default-src 'self' 'unsafe-inline'">
+
+    <meta charset="UTF-8">
+    <meta content="default-src 'self' 'unsafe-inline'" http-equiv="content-security-policy">
+
+    <link href="css/all.min.css" rel="stylesheet">
+    <link href="css/materialize.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<p>body</p>
-<style>
-    body {
-        background: #fff
-    }
-</style>
-<script>
-    console.log('yo')
-</script>
+<div class="container center-align">
+    <!-- header -->
+    <h3><i class="fas fa-images"></i> Image Resizer</h3>
+
+    <p>Select a image file to resize.</p>
+
+    <form id="image-form">
+
+        <!-- select file -->
+        <div class="file-field input-field">
+            <div class="btn">
+                Browse
+            </div>
+            <input id="image-file-path"
+                   type="file"/>
+        </div>
+
+        <!-- upload file -->
+        <div class="file-path-wrapper">
+            <input class="file-path validate"
+                   placeholder="Upload File"
+                   type="text"/>
+        </div>
+
+        <!-- note -->
+        <p>
+            <strong>
+                Quality:
+            </strong>
+            <em>
+                The lower quality, the smaller file size.
+            </em>
+        </p>
+
+        <p class="range-field">
+            <input id="slider"
+                   max="100"
+                   min="0"
+                   type="range">
+        </p>
+
+        <input class="btn black"
+               type="submit"
+               value="Resize">
+    </form>
+</div>
+
+<script src="js/materialize.min.js"></script>
 </body>
 </html>

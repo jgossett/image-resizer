@@ -19,8 +19,8 @@ function createBrowserWindow() {
 function createAboutWindow() {
     const browserWindow = new BrowserWindow({
         title: `About ${app.name}`,
-        width: 200,
-        height: 300,
+        width: 300,
+        height: 400,
         resizable: false,
         icon: `${__dirname}/assets/icons/icon__256x256.png`
     });
