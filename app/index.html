@@ -80,10 +80,10 @@
     resizeImageForm.addEventListener('submit', event => {
         event.preventDefault();
 
-        const imagePath = imagePathElement.files[0].path;
-        const imageQuality = imageQualityElement.value;
+        const path = imagePathElement.files[0].path;
+        const quality = imageQualityElement.value;
 
-        ipcRenderer.send('image.shrink', {imagePath, imageQuality});
+        ipcRenderer.send('image.shrink', {path, quality});
     });
 </script>
 </body>
