@@ -1,4 +1,8 @@
-const {app, BrowserWindow, Menu, isMac, globalShortcut, ipcMain} = require('electron');
+const {app, BrowserWindow, Menu, isMac, globalShortcut, ipcMain, shell} = require('electron');
+const imagemin = require('imagemin');
+const imageminMozjpeg = require('imagemin-mozjpeg');
+const imageminOptipng = require('imagemin-optipng');
+const slash = require('slash');
 
 const ENVIRONMENTS = {
     local: 1,
@@ -99,8 +103,35 @@ async function onStartUp() {
     mainWindow = createBrowserWindow();
 }
 
-ipcMain.on('image.shrink', (event, options) => {
-   console.log(options);
+ipcMain.on('image.shrink', (event, {path, quality, outputFolderPath}) => {
+    console.log('Received "image.shrink" request.', {path, quality, outputFolderPath});
+    shrinkImage(path, quality, outputFolderPath)
 });
+
+async function shrinkImage(path, quality, outputFolderPath) {
+    try {
+        const optimizationLevel = Math.floor(quality / 8);
+        const pathWithBackslashes = slash(path);
+        const outputFolderPathWithBackslashes = slash(outputFolderPath)
+        const shrunkPaths = await imagemin(
+            [pathWithBackslashes],
+            {
+                destination: outputFolderPathWithBackslashes,
+                plugins: [
+                    imageminOptipng({
+                        optimizationLevel
+                    }),
+                    imageminMozjpeg({
+                        quality
+                    })
+                ]
+            }
+        );
+
+        await shell.openPath(shrunkPaths[0].destinationPath);
+    } catch (error) {
+        console.error('Could not shrink image file.', error);
+    }
+}
 
 onStartUp()
