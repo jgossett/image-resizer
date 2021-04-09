@@ -1,19 +1,27 @@
 {
   "name": "image-resize",
+  "productName": "Image Resizer",
   "version": "1.0.0",
-  "description": "",
+  "description": "Resizes PNG and JPEG images.",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon --exec \"npm run start:electron\"",
-    "start:electron": "electron ."
+    "start": "npm run start:electron",
+    "start:electron": "nodemon --exec \"electron .\"",
+    "build": "npm run build:application:windows && npm run build:installer:windows",
+    "build:application:windows": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --out=\"build/desktop-application\" --icon=app/assets/icons/application-icon.ico",
+    "build:installer:windows": "node tools/build-windows-installer.js",
+    "open:logs": "cd tools && open-logs.bat"
   },
   "author": "Joshua Gossettt",
   "license": "ISC",
   "devDependencies": {
     "electron": "^12.0.2",
+    "electron-winstaller": "^5.0.0",
     "nodemon": "^2.0.7"
   },
   "dependencies": {
+    "electron-log": "^4.3.3",
+    "electron-packager": "^15.2.0",
     "imagemin": "^7.0.1",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-optipng": "^8.0.0",

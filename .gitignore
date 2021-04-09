@@ -19,6 +19,7 @@
 /dist/
 /external_binaries/
 /out/
+/build/
 /vendor/.gclient
 /vendor/debian_jessie_mips64-sysroot/
 /vendor/debian_stretch_amd64-sysroot/

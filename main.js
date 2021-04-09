@@ -1,8 +1,9 @@
-const {app, BrowserWindow, Menu, isMac, globalShortcut, ipcMain, shell} = require('electron');
+const {app, BrowserWindow, Menu, isMac, globalShortcut, ipcMain} = require('electron');
 const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminOptipng = require('imagemin-optipng');
 const slash = require('slash');
+const log = require('electron-log')
 
 const ENVIRONMENTS = {
     local: 1,
@@ -18,7 +19,7 @@ function createBrowserWindow() {
         title: app.name,
         width: environment !== ENVIRONMENTS.local ? 500 : 1000,
         height: 600,
-        icon: `${__dirname}/assets/icons/icon__256x256.png`,
+        icon: `${__dirname}/app/assets/icons/application-icon__256x256.png`,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -40,7 +41,7 @@ function createAboutWindow() {
         width: 300,
         height: 400,
         resizable: false,
-        icon: `${__dirname}/assets/icons/icon__256x256.png`
+        icon: `${__dirname}/app/assets/icons/application-icon__256x256.png`
     });
 
     browserWindow.loadFile(`./app/about.html`);
@@ -103,18 +104,18 @@ async function onStartUp() {
     mainWindow = createBrowserWindow();
 }
 
-ipcMain.on('image.shrink', (event, {path, quality, outputFolderPath}) => {
-    console.log('Received "image.shrink" request.', {path, quality, outputFolderPath});
+ipcMain.on('image/shrink?request', (event, {path, quality, outputFolderPath}) => {
+    log.log('Received "image/shrink" request.', {path, quality, outputFolderPath});
     shrinkImage(path, quality, outputFolderPath)
 });
 
-async function shrinkImage(path, quality, outputFolderPath) {
+async function shrinkImage(sourcePath, quality, outputFolderPath) {
     try {
         const optimizationLevel = Math.floor(quality / 8);
-        const pathWithBackslashes = slash(path);
+        const sourcePathWithBackslashes = slash(sourcePath);
         const outputFolderPathWithBackslashes = slash(outputFolderPath)
         const shrunkPaths = await imagemin(
-            [pathWithBackslashes],
+            [sourcePathWithBackslashes],
             {
                 destination: outputFolderPathWithBackslashes,
                 plugins: [
@@ -128,9 +129,11 @@ async function shrinkImage(path, quality, outputFolderPath) {
             }
         );
 
-        await shell.openPath(shrunkPaths[0].destinationPath);
+        const destinationPath = shrunkPaths[0].destinationPath;
+        log.log(shrunkPaths)
+        mainWindow.webContents.send('image/shrink?response', {path: destinationPath});
     } catch (error) {
-        console.error('Could not shrink image file.', error);
+        log.error('Could not shrink image file.', error);
     }
 }
 

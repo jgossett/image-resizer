@@ -68,6 +68,7 @@
     const {join} = require('path');
     const {homedir} = require('os');
     const {ipcRenderer} = require('electron');
+    const log = require('electron-log');
 
     const outputFolderPathElement = document.getElementById('output-folder-path');
     const imageQualityElement = document.getElementById('image-quality');
@@ -83,7 +84,12 @@
         const path = imagePathElement.files[0].path;
         const quality = imageQualityElement.value;
 
-        ipcRenderer.send('image.shrink', {path, quality, outputFolderPath});
+        ipcRenderer.send('image/shrink?request', {path, quality, outputFolderPath});
+    });
+
+    ipcRenderer.on('image/shrink?response', (event, {path}) => {
+        log.log('Received "image/shrink?response" response.', path);
+        M.toast({html: `Shrunk image file. See "${path}".`});
     });
 </script>
 </body>
